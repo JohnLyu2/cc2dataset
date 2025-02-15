@@ -12,3 +12,4 @@ wandb
 **/*.tar.gz
 .mypy_cache
 .pytest_cache
+**/.DS_Store
