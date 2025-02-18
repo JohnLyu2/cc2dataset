@@ -392,7 +392,7 @@ def cc2dataset(
         else:
             wat_index_files = read_wat_index_files(wat_index_count, wat_count, source_cc_protocol)
         # write wat index files to disk in output_path with fsspec
-        logger.info(f"wat files: {wat_index_files}")
+        # logger.info(f"wat files: {wat_index_files}")
         with fsspec.open(f"{output_path}/wat_index_files.txt", "w", encoding="utf8") as f:
             f.write("\n".join(wat_index_files))
     else:
