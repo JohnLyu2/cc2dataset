@@ -2,6 +2,7 @@
 
 
 from fastwarc.warc import ArchiveIterator, WarcRecordType
+import fire
 import simdjson
 import fsspec
 from timeit import default_timer as timer
@@ -61,11 +62,21 @@ def valid_text_link(link):
         return False
     return True
 
+def valid_pdf_link(link):
+    splits = link.get("url", "").split(".")
+    if len(splits) < 2:
+        return False
+    if splits[-1] != "pdf":
+        return False
+    return True
 
 def extract_text_from_links(links):
     filtered_links = [{"url": link["url"], "alt": link.get("text", "")} for link in links if valid_text_link(link)]
     return filtered_links
 
+def extract_pdf_from_links(links):
+    filtered_links = [{"url": link["url"], "alt": link.get("text", "")} for link in links if valid_pdf_link(link)]
+    return filtered_links
 
 def valid_audio_link(link):
     valid_audio = any(link.get("url", "").endswith(ext) for ext in [".ogg", ".wav", ".mp3", ".flac", ".m4a"])
@@ -125,6 +136,8 @@ def extract_documents_from_links(links, document_type):
         return extract_audio_from_links(links)
     elif document_type == "text":
         return extract_text_from_links(links)
+    elif document_type == "pdf":
+        return extract_pdf_from_links(links)
     elif document_type == "video":
         return extract_video_from_links(links)
     else:
@@ -335,6 +348,7 @@ def get_date_str():
 
 def cc2dataset(
     output_path,
+    read_wats_from_file=None,
     wat_index_count=1,
     wat_count=100,
     master="local",
@@ -344,7 +358,7 @@ def cc2dataset(
     shuffle=True,
     resume=None,
     spark_builder=None,
-    document_type="image",
+    document_type="pdf",
     source_cc_protocol="s3",
 ):
     """Convert common crawl to image caption set"""
@@ -371,8 +385,14 @@ def cc2dataset(
         return spark_builder()
 
     if resume is None:
-        wat_index_files = read_wat_index_files(wat_index_count, wat_count, source_cc_protocol)
+        if read_wats_from_file is not None:
+            with fsspec.open(read_wats_from_file, "r", encoding="utf8") as f:
+                wat_index_files = f.read().splitlines()
+            wat_index_files = wat_index_files[:wat_count]
+        else:
+            wat_index_files = read_wat_index_files(wat_index_count, wat_count, source_cc_protocol)
         # write wat index files to disk in output_path with fsspec
+        logger.info(f"wat files: {wat_index_files}")
         with fsspec.open(f"{output_path}/wat_index_files.txt", "w", encoding="utf8") as f:
             f.write("\n".join(wat_index_files))
     else:
