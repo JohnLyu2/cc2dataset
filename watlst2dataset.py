@@ -24,7 +24,7 @@ def cc2dataset(
 ):
     """Convert common crawl to pdf url set"""
 
-    assert resume is None and multipart is None, "Now do not support resume and multipart"
+    assert resume is None, "Now do not support resume"
 
     if resume is not None and multipart is None:
         raise ValueError("Cannot resume without multipart")
