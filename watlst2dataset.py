@@ -72,7 +72,7 @@ def cc2dataset(
 cc2dataset(
     output_path="outputs",
     master="local",
-    num_cores=2,
-    mem_gb=4,
-    multipart=None,
+    num_cores=256,
+    mem_gb=2048,
+    multipart=90,
 )
