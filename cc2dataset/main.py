@@ -359,7 +359,7 @@ def cc2dataset(
     resume=None,
     spark_builder=None,
     document_type="pdf",
-    source_cc_protocol="s3",
+    source_cc_protocol="http",
 ):
     """Convert common crawl to image caption set"""
 
