@@ -3,7 +3,7 @@ from loguru import logger
 import pandas as pd
 from pyspark.sql import SparkSession
 from cc2dataset.spark_session_builder import build_spark_session
-from cc2dataset.main import process_one_part, process_wat, get_date_str
+from cc2dataset.main import process_one_part, process_multi_part, process_wat, get_date_str
 
 
 # SAMPLE_WAT_URL = f"https://data.commoncrawl.org/{SAMPLE_WAT_RELATIVE}"
@@ -61,7 +61,12 @@ def cc2dataset(
     wat_index_files = []
     with fsspec.open(WAT_LST_PATH, "r", encoding="utf8") as f:
         wat_index_files = f.read().splitlines()
-    process_one_part(output_path, wat_index_files, build_spark, shuffle, document_type, source_cc_protocol)
+    if multipart is None:
+        process_one_part(output_path, wat_index_files, build_spark, shuffle, document_type, source_cc_protocol)
+    else:
+        process_multi_part(
+            output_path, wat_index_files, build_spark, multipart, shuffle, resume, document_type, source_cc_protocol
+        )
 
 
 cc2dataset(
