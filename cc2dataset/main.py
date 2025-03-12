@@ -295,7 +295,7 @@ def process_one_part(output_path, wat_index_files, build_spark, shuffle, documen
         yield from process_wat(prefix + x[0], document_type)
 
     output = wat_rdd.mapPartitions(extract)
-    df = output.toDF(["uid", "url", "alt", "cc_filename", "page_url"])
+    df = output.toDF(["uid", "url", "text", "cc_filename", "page_url"])
 
     deduplicate_repartition_count(df, output_path, wat_count, spark, shuffle)
 
